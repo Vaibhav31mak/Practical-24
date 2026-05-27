@@ -7,11 +7,10 @@ public sealed class Repository<T>(DbContext context) : IRepository<T> where T : 
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbSet.FindAsync([id], cancellationToken);
-        if (entity is IStatusCheck statusCheck && !statusCheck.Status)
-        {
-            return null;
-        }
+        //var entity = await _dbSet.FindAsync(id, cancellationToken);
+        var entity = await _dbSet.FirstOrDefaultAsync
+            (e => EF.Property<int>(e, "Id") == id
+            && EF.Property<bool>(e, "Status"), cancellationToken);
 
         return entity;
     }

@@ -6,17 +6,24 @@ public sealed class EmployeesController(IEmployeeService employeeService) : Cont
 {
     private readonly IEmployeeService _employeeService = employeeService;
 
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<EmployeeResponse>>> GetAll(CancellationToken cancellationToken)
-    {
-        var employees = await _employeeService.GetAllAsync(cancellationToken);
-        return Ok(employees);
-    }
+    //[HttpGet]
+    //public async Task<ActionResult<IReadOnlyList<EmployeeResponse>>> GetAll(CancellationToken cancellationToken)
+    //{
+    //    var employees = await _employeeService.GetAllAsync(cancellationToken);
+    //    return Ok(employees);
+    //}
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<EmployeeResponse>> GetById(int id, CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<ActionResult> Get([FromQuery] int? id,
+        CancellationToken cancellationToken)
     {
-        var employee = await _employeeService.GetByIdAsync(id, cancellationToken);
+        if (id is null)
+        {
+            var employees = await _employeeService.GetAllAsync(cancellationToken);
+            return Ok(employees);
+        }
+
+        var employee = await _employeeService.GetByIdAsync(id.Value, cancellationToken);
         if (employee is null)
         {
             return NotFound();
@@ -29,7 +36,7 @@ public sealed class EmployeesController(IEmployeeService employeeService) : Cont
     public async Task<ActionResult<EmployeeResponse>> Create(CreateEmployeeRequest request, CancellationToken cancellationToken)
     {
         var employee = await _employeeService.CreateAsync(request, cancellationToken);
-        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
+        return CreatedAtAction(nameof(Get), new { id = employee.Id }, employee);
     }
 
     [HttpPut("{id:int}")]
