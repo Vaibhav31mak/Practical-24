@@ -1,6 +1,6 @@
 namespace Practical24.Domain.Entities;
 
-public sealed class Employee
+public sealed class Employee : IStatusCheck
 {
     public int Id { get; set; }
     public required string Name { get; set; }
